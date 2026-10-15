@@ -1,0 +1,163 @@
+Kavling Pintar: Kavling pintar adalah projek saya untuk membuat kavling dimana di dalam nya akan di ditaruh sebuah tanaman dengan pot pot nya, dimana kavling ini akan bertugas memaintain tanaman di dalam nya, juga kavling ini harus pintar memanfaatkan sumber daya yang ada di sekitar nya seefisien mungkin
+
+NTK:
+-Component (komponen yang dimaksud yang bertugas akan suatu hal)
+-Parameter Ideal(parameter yang nanti ditentukan dalam program)
+-Pendeteksian (mendeteksi dinamika lingkungan dan menjadikan nya parameter penilaian)
+-Aksi Pasif(aksi yang pasti dilakukan tanpa dasar pendeteksian parameter)
+-Aksi Reaktif (aksi yang hasil keputusan pendeteksian parameter)
+-Goal (Tujuan dari bagian yang dimaksud)
+-Attributes Electronic (komponen robotic yang akan digunakan component)
+
+Tanaman Target Kavling:{
+1.Sawi
+2.Bayam
+3.Kankung
+4.Selada
+5.Kailan
+6.Pakcoy
+}
+
+INFO: Tanaman Target Kavling adalah tanaman yang tidak membutuhkan tanah terlalu dalam dan tidak tumbuh tinggi terlalu menjulang
+
+Kavling to External Environment {
+
+Component: -Atap Kavling
+
+Parameter Ideal: 
+1.Flux Matahari
+
+Pendekteksian: 	
+1.Flux Matahari / Intensitas Cahaya
+2.Air Hujan
+
+Aksi Pasif:		
+1.Buka Tutup Atap Kavling (saat pagi hari jam 07:00 - 09:00)
+
+Aksi Reaktif:
+1.Buka Tutup Atap Kavling (saat hujan / matahari uv flux terlalu tinggi)
+
+Attributes Electronic:
+1.Geared DC Motor
+2.Sensor Infrared x 2
+
+Goal:
+1. Menjaga Tanaman di dalam kavling dari gangguan lingkungan luar(hujan, indeks matahari tinggi)
+}
+
+Kavling Source Supply {
+
+Component: -Box disamping Kavling
+
+Parameter Ideal:
+1.Air Dalam Tangki
+2.Pestisida Dalam Tangki
+3.Pupuk Dalam Tangki
+4.AirPh dalam tangki
+5.Baking Soda dalam tangki
+6.Cuka dalam tangki
+7.Hydrogen Peroxide Oxygen 3% dalam tangki
+8.Ragi Roti Fermipan
+
+Pendeteksian:
+1.Kadar Air dalam tangki
+2.Kadar pestisida dalam tangki
+3.Kadar Pupuk dalam tangka
+4.Kadar Lautan pupuk dengan Air dalam tangka
+5.Kadar AirPh dalam tangki
+6.Baking Soda dalam tangki
+7.Cuka dalam tangki
+8.Hydrogen Peroxide Oxygen 3% dalam tangki
+9.Ragi Roti Fermipan
+
+Aksi Reaktif:
+1.Membunyikan Alarm Bahwa tangki tertentu kurang atau kosong
+2.Memasukan Campuran Pupuk dengan Air lalu mengaduknya
+
+Aksi Pasif:
+
+Goal:
+1.Menyediakan suplai Bahan Bahan untuk mensupport lingkungan dalam kavling
+
+}
+
+Kavling to Internal Environment {
+
+Component: -Sisi Sisi Kavling
+
+Parameter Ideal:
+1.Suhu
+2.Kadar Oksigen
+3.Kadar Carbon Dioksida
+	
+Pendeteksian:	
+1.Suhu 
+2.Kadar Oksigen(malam)
+3.Kadar Karbon dioksida(siang)
+4.Kelembapan Udara
+
+Aksi Pasif:		
+1.Penyemprotan Air (dalam jam jam tertentu sesuai program)
+2.Penyemprotan Pestisida (dalam jam jam tertentu sesuai program)
+
+Aksi Reaktif:
+1.Memasukan Udara dari lingkungan luar ke internal kavling 
+2.Penyesuaian Kadar Oksigen / Karbon Dioksida
+3.Penyesuaian Kelembapan Udara
+4.Penyaluran Gas Karbon Dioksida saat jam jam efekif flux matahari
+5.Penyaluran Gas Oksigen saat kurang kadar oksigen malam hari
+
+Goal:
+1.membuat lingkungan Udara yang ideal sesuai parameter ideal			
+}
+
+Kavling Pot to Tanaman {
+
+Component: Pot Didalam Kavling
+
+Parameter Ideal: 
+1.pH Tanah
+2.Kelembapan Tanah / Kadar Air Tanah
+
+Pendeteksian:	 
+1.pH Tanah
+2.Kelembapan Tanah / Kadar Air Tanah
+
+Aksi Reaktif:   	 
+1.Pemasukan air ke tanah
+2.Pemasukan Cairan pH
+
+Aksi Pasif:
+1.Pemasukan campuran air Pupuk ke tanah
+
+Goal:
+1.membuat lingkungan tanah yang ideal sesuai parameter ideal
+
+}
+
+Kavling Interface to user {
+
+Component: Box Interface Disamping Kavling
+
+Parameter Ideal:
+1.Status Kavling
+
+Pendeteksian:
+1.Input Status Kavling
+
+Aksi Reaktif:
+1.Membuka Atap Kavling Saat Status Panen
+
+Aksi Pasif:
+1.Memberikan informasi suhu dalam kavling, kadar karbon dioksida dan oksigen
+2.Memberikan informasi Kelembapan Tanah dan pH Dalam Kavling
+3.Memberikan Informasi flux uv matahari
+4.memberikan informasi kadar tangka, air, pestisida, pupuk, larutan air dan pupuk
+5.Memberikan informasi Aksi yang sedang dilakukan atau Idle
+
+
+Goal: 
+1.memberi tahu pada pengamat kavling informasi terkini soal kavling
+2.Penentuan Keberlangsungan Kavling sedang "Merawat" atau "Panen"
+}
+

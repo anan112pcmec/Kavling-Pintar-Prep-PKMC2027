@@ -4,7 +4,7 @@
 //  Ganti placeholder foto dengan: image("foto/nama-file.jpg", width: 100%)
 // ============================================================
 
-#set document(title: "Kavling Pintar", author: "Anan")
+#set document(title: "Kavling Pintar", author: "Faiz Hannan Hakim")
 #set page(
   paper: "a4",
   margin: (x: 2.5cm, y: 2.5cm),
@@ -81,12 +81,12 @@
   #align(center)[*Abstrak*]
   #v(0.2em)
   #set par(justify: true)
-  Kavling Pintar adalah rancangan kavling yang berisi tanaman beserta pot-potnya
+  Kavling Pintar adalah rancangan kavling yang akan mengjaga tanaman yang ada di dalam nya, kavling berisi tanaman beserta pot-potnya
   dan bertugas merawat tanaman tersebut secara mandiri. Kavling dirancang untuk
   memanfaatkan sumber daya di sekitarnya, seperti cahaya matahari, udara luar,
   dan air, seefisien mungkin. Sistem dibagi menjadi lima bagian: atap,
   suplai bahan, lingkungan udara internal, pot tanaman, dan antarmuka
-  pengguna. Setiap bagian dijelaskan dengan format NTK, yaitu
+  pengguna. Setiap bagian dijelaskan dengan format NTK(Need To Know), yaitu
   komponen, parameter ideal, pendeteksian, aksi pasif, aksi reaktif, tujuan,
   dan atribut elektronik. Dokumen ini adalah gambaran besar; foto komponen
   dan nilai parameter akan dilengkapi pada tahap berikutnya.
@@ -114,7 +114,7 @@ Kavling Pintar adalah kavling yang di dalamnya diletakkan tanaman beserta
 pot-potnya. Kavling bertugas memelihara tanaman di dalamnya dan harus pandai
 memanfaatkan sumber daya di sekitarnya seefisien mungkin.
 
-== Pendekatan Penjelasan (NTK)
+== NTK (Need To Know)
 
 Setiap bagian sistem dijelaskan dengan tujuh elemen berikut.
 
@@ -137,19 +137,67 @@ Setiap bagian sistem dijelaskan dengan tujuh elemen berikut.
   [Attributes Electronic], [Komponen robotik yang digunakan oleh component.],
 )
 
+#linebreak()
+#linebreak()
+#linebreak()
+#linebreak()
+#linebreak()
+#linebreak()
+#linebreak()
+#linebreak()
+#linebreak()
+#linebreak()
+#linebreak()
+#linebreak()
+
 = Tanaman Target
 
 Tanaman target kavling adalah tanaman yang tidak membutuhkan tanah terlalu
-dalam dan tidak tumbuh terlalu tinggi menjulang:
+dalam dan tidak tumbuh terlalu tinggi menjulang. Semuanya adalah tanaman
+sayuran daun (hortikultura semusim):
+
+#let tanaman = (
+  ("Sawi", "Brassica juncea", "jpeg"),
+  ("Bayam", "Amaranthus tricolor", "jpg"),
+  ("Kangkung", "Ipomoea aquatica", "jpg"),
+  ("Selada", "Lactuca sativa", "jpg"),
+  ("Kailan", "Brassica oleracea var. alboglabra", "jpg"),
+  ("Pakcoy", "Brassica rapa subsp. chinensis", "jpg"),
+)
 
 #grid(
   columns: (1fr, 1fr, 1fr),
-  row-gutter: 0.6em,
-  [1. Sawi], [2. Bayam], [3. Kangkung],
-  [4. Selada], [5. Kailan], [6. Pakcoy],
+  column-gutter: 1em,
+  row-gutter: 0.99em,
+  ..tanaman.enumerate(start: 1).map(((i, t)) => {
+    let (nama, ilmiah, ext) = t
+    align(center)[
+      #image("foto/" + lower(nama) + "." + ext, width: 100%, height: 3.5cm, fit: "cover")
+      #v(0.2em)
+      *#i. #nama* \
+      #text(size: 9.5pt, emph(ilmiah))
+    ]
+  }),
 )
 
-#foto("Tanaman target kavling (opsional)", h: 4cm)
+#linebreak()
+#linebreak()
+#linebreak()
+#linebreak()
+#linebreak()
+#linebreak()
+#linebreak()
+#linebreak()
+#linebreak()
+#linebreak()
+#linebreak()
+#linebreak()
+#linebreak()
+#linebreak()
+#linebreak()
+#linebreak()
+#linebreak()
+#linebreak()
 
 = Gambaran Umum Sistem
 
@@ -171,7 +219,38 @@ antarmuka menyampaikan informasi kepada pengamat.
   [5], [Kavling Interface ke User], [Box interface di samping kavling],
 )
 
-#foto("Gambaran besar tata letak Kavling Pintar (diagram atau foto)", h: 7cm)
+#v(0.5em)
+
+#grid(
+  columns: (1fr, 1fr),
+  column-gutter: 1em,
+  foto(
+    "Tampak penuh Kavling Pintar",
+    isi: image("foto/Tampak_Full.png", width: 100%, height: 7cm, fit: "contain"),
+  ),
+  foto(
+    "Tampak rangka Kavling Pintar",
+    isi: image("foto/Tampak_Rangka.png", width: 100%, height: 7cm, fit: "contain"),
+  ),
+)
+
+#linebreak()
+#linebreak()
+#linebreak()
+#linebreak()
+#linebreak()
+#linebreak()
+#linebreak()
+#linebreak()
+#linebreak()
+#linebreak()
+#linebreak()
+#linebreak()
+#linebreak()
+#linebreak()
+#linebreak()
+#linebreak()
+
 
 = Rincian Bagian Sistem
 

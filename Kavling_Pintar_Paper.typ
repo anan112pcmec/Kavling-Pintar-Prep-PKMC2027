@@ -13,6 +13,9 @@
 // Palet warna (satu aksen saja supaya tetap rapi)
 #let accent = rgb("#2E6B3F")
 #let accent-soft = accent.lighten(90%)
+// Warna sekunder: oker/amber (cahaya matahari), pasangan hangat untuk hijau
+#let accent2 = rgb("#B8741A")
+#let accent2-soft = accent2.lighten(88%)
 #let ink = luma(30)
 #let muted = luma(110)
 
@@ -57,7 +60,9 @@
   width: 100%,
   above: 2em,
   below: 1em,
-  stroke: (bottom: 0.7pt + accent),
+  stroke: (bottom: 1pt + gradient.linear(
+    (accent2, 0%), (accent2, 12%), (accent, 12%), (accent, 100%),
+  )),
   inset: (bottom: 5pt),
   it,
 )
@@ -67,7 +72,12 @@
 // ---------- Figure & tabel ----------
 
 #show figure: set block(breakable: false, above: 1.2em, below: 1.2em)
-#show figure.caption: set text(size: 9.5pt, fill: muted)
+#show figure.caption: it => context {
+  set text(size: 9.5pt, fill: muted)
+  text(weight: "bold", fill: accent2)[#it.supplement #it.counter.display(it.numbering)]
+  it.separator
+  it.body
+}
 #set figure.caption(separator: [. ])
 #show figure.where(kind: table): set figure.caption(position: top)
 #show table: set par(justify: false)
@@ -98,7 +108,7 @@
   if xs.len() == 0 [—] else {
     list(
       tight: true,
-      marker: text(fill: accent)[•],
+      marker: text(fill: accent2)[•],
       indent: 0pt,
       body-indent: 6pt,
       ..xs,
@@ -115,7 +125,7 @@
   inset: (x: 8pt, y: 7pt),
   stroke: (x, y) => (
     top: if y == 0 { 1pt + accent } else { none },
-    bottom: if y == 0 { 0.6pt + accent } else { 0.4pt + luma(215) },
+    bottom: if y == 0 { 1pt + accent2 } else { 0.4pt + luma(215) },
   ),
   fill: (x, y) => if y == 0 { accent-soft } else { none },
   ..rows,
@@ -178,7 +188,7 @@
 
 // Kartu ciri fisik tanaman
 #let ciri(judul, ket) = block(
-  stroke: (left: 2pt + accent),
+  stroke: (left: 2.5pt + accent2),
   inset: (left: 9pt, y: 3pt),
 )[
   *#judul* \
@@ -191,11 +201,15 @@
 
 #page(header: none, footer: none, margin: (x: 3cm, y: 3cm))[
   #set par(justify: false)
-  #text(size: 10pt, weight: "bold", fill: accent, tracking: 2pt)[DOKUMEN RANCANGAN SISTEM]
+  #text(size: 10pt, weight: "bold", fill: accent2, tracking: 2pt)[DOKUMEN RANCANGAN SISTEM]
   #v(1fr)
   #text(size: 40pt, weight: "bold")[#judul]
   #v(0.5em)
-  #line(length: 4cm, stroke: 3pt + accent)
+  #stack(
+    dir: ltr,
+    line(length: 2.6cm, stroke: 3pt + accent),
+    line(length: 1.2cm, stroke: 3pt + accent2),
+  )
   #v(0.8em)
   #text(size: 15pt, fill: luma(70))[Rancangan Sistem Kavling Otomatis \ untuk Perawatan Tanaman]
   #v(1fr)
@@ -216,7 +230,8 @@
 #block(
   width: 100%,
   fill: accent-soft,
-  radius: 3pt,
+  radius: (right: 3pt),
+  stroke: (left: 3pt + accent2),
   inset: (x: 0.9cm, y: 0.7cm),
 )[
   #text(weight: "bold", fill: accent)[Abstrak]
@@ -232,7 +247,7 @@
   dan atribut elektronik. Dokumen ini adalah gambaran besar; foto komponen
   dan nilai parameter akan dilengkapi pada tahap berikutnya.
   #v(0.4em)
-  #text(size: 9.5pt)[*Kata kunci:* kavling pintar, otomasi tanaman, sensor, IoT]
+  #text(size: 9.5pt)[#text(fill: accent2, weight: "bold")[Kata kunci:] kavling pintar, otomasi tanaman, sensor, IoT]
 ]
 
 #v(0.8cm)
@@ -309,7 +324,7 @@ sayuran daun (hortikultura semusim):
     let (nama, ilmiah, ext) = t
     align(center)[
       #box(clip: true, radius: 3pt)[
-        #image("foto/" + lower(nama) + "." + ext, width: 100%, height: 3cm, fit: "cover")
+        #image("foto/" + lower(nama) + "." + ext, width: 100%, height: 3cm, fit: "stretch")
       ]
       #v(0.2em)
       *#i. #nama* \
@@ -359,18 +374,16 @@ antarmuka menyampaikan informasi kepada pengamat (@tbl-bagian).
   ),
 ) <tbl-bagian>
 
-#grid(
-  columns: (1fr, 1fr),
-  column-gutter: 1em,
-  foto(
+#linebreak()
+  #foto(
     "Tampak penuh Kavling Pintar",
-    isi: image("foto/Tampak_Full.png", width: 100%, height: 5cm, fit: "contain"),
+    isi: image("foto/Tampak_Full.png", width: 100%, height: 6cm, fit: "contain"),
   ),
-  foto(
+
+  #foto(
     "Tampak rangka Kavling Pintar",
-    isi: image("foto/Tampak_Rangka.png", width: 100%, height: 5cm, fit: "contain"),
+    isi: image("foto/Tampak_Rangka.png", width: 100%, height: 6cm, fit: "contain"),
   ),
-)
 
 #pagebreak(weak: true)
 

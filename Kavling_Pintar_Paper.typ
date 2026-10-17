@@ -72,8 +72,8 @@
   #v(0.3em)
   #text(size: 13pt)[Rancangan Sistem Kavling Otomatis untuk Perawatan Tanaman]
   #v(0.8em)
-  Anan \
-  #text(size: 10pt, fill: gray)[Draf gambaran besar]
+  Faiz Hannan \
+  #text(size: 10pt, fill: gray)[Draf Kv-001]
   #v(1cm)
 ]
 
@@ -181,6 +181,23 @@ sayuran daun (hortikultura semusim):
 )
 
 #linebreak()
+
+Demikian dapat diklasifikasikan bahwa kavling pintar akan merawat tanaman-tanaman dengan ciri fisik sebagai berikut:
+
+#v(0.5em)
+
+#grid(
+  columns: (1fr, 1fr),
+  column-gutter: 2em,
+  row-gutter: 0.8em,
+  [*• Batang pendek dan lunak* \ #text(size: 9.5pt, fill: luma(100))[Tidak berkayu dan bertekstur basah/berair]],
+  [*• Kanopi rendah & mendatar* \ #text(size: 9.5pt, fill: luma(100))[Tumbuh melebar ke samping, tidak menjulang]],
+  [*• Dominasi daun rimbun* \ #text(size: 9.5pt, fill: luma(100))[Fokus visual pada helai daun yang lebat]],
+  [*• Akar di permukaan tanah* \ #text(size: 9.5pt, fill: luma(100))[Berupa perakaran serabut yang dangkal]]
+)
+
+
+
 #linebreak()
 #linebreak()
 #linebreak()
@@ -194,10 +211,7 @@ sayuran daun (hortikultura semusim):
 #linebreak()
 #linebreak()
 #linebreak()
-#linebreak()
-#linebreak()
-#linebreak()
-#linebreak()
+
 
 = Gambaran Umum Sistem
 
@@ -246,168 +260,211 @@ antarmuka menyampaikan informasi kepada pengamat.
 #linebreak()
 #linebreak()
 #linebreak()
-#linebreak()
-#linebreak()
-#linebreak()
-#linebreak()
 
+#let tbd = text(fill: luma(120), [_tbd_])
+
+#let tbl(..rows) = table(
+  columns: (auto, 1fr),
+  inset: 7pt,
+  stroke: 0.5pt + luma(160),
+  fill: (x, y) => if x == 0 { luma(235) } else { none },
+  ..rows,
+)
+
+// poin 1
+#let tjn(masalah, goal) = tbl(
+  [*Masalah*], masalah,
+  [*Goal*], goal,
+)
+
+// poin 3
+#let teknis(param, deteksi, pasif, reaktif) = tbl(
+  [*Parameter ideal*], param,
+  [*Pendeteksian*], deteksi,
+  [*Aksi pasif*], pasif,
+  [*Aksi reaktif*], reaktif,
+)
+
+// poin 7
+#let harga(..baris) = table(
+  columns: (auto, 1fr, auto, auto, auto),
+  inset: 7pt,
+  stroke: 0.5pt + luma(160),
+  fill: (x, y) => if y == 0 { luma(225) } else { none },
+  [*No*], [*Komponen*], [*Jumlah*], [*Harga satuan*], [*Subtotal*],
+  ..baris,
+)
+
+#let bagian(tujuan, visual, teknis, pendalaman, material, elektronika, rincian) = {
+  [=== Tujuan dan Masalah]
+  tujuan
+  [=== Penjelasan Visual]
+  visual
+  [=== Teknis Bagian]
+  teknis
+  [=== Pendalaman Bagian]
+  pendalaman
+  [=== Material Penyusun Komponen]
+  material
+  [=== Elektronika yang Bekerja]
+  elektronika
+  [=== Rincian Komponen dan Harga]
+  rincian
+}
 
 = Rincian Bagian Sistem
 
 == Kavling ke Lingkungan Luar
 
-Bagian ini menangani hubungan kavling dengan kondisi di luar, terutama hujan
-dan intensitas sinar matahari.
-
-#ntk(
-  [Atap Kavling],
-  lst([Flux matahari]),
-  lst([Flux matahari / intensitas cahaya], [Air hujan]),
-  lst([Buka-tutup atap kavling pada pagi hari, pukul 07:00 – 09:00]),
-  lst([Buka-tutup atap kavling saat hujan atau saat flux UV matahari terlalu tinggi]),
+#bagian(
+  tjn(
+    [Tanaman di dalam kavling terancam hujan dan flux matahari yang terlalu tinggi.],
+    [Menjaga tanaman di dalam kavling dari gangguan lingkungan luar (hujan, indeks matahari tinggi).],
+  ),
+  [
+    Komponen: *atap kavling*.
+    #grid(
+      columns: (1fr, 1fr),
+      column-gutter: 1em,
+      foto("Atap kavling", h: 4.5cm),
+      foto("Geared DC motor dan sensor infrared", h: 4.5cm),
+    )
+  ],
+  teknis(
+    lst([Flux matahari]),
+    lst([Flux matahari / intensitas cahaya], [Air hujan]),
+    lst([Buka-tutup atap kavling pada pagi hari, pukul 07:00 – 09:00]),
+    lst([Buka-tutup atap kavling saat hujan atau saat flux UV matahari terlalu tinggi]),
+  ),
+  tbd,
+  tbd,
   lst([Geared DC motor], [Sensor infrared #sym.times 2]),
-  [Menjaga tanaman di dalam kavling dari gangguan lingkungan luar (hujan dan
-    indeks matahari tinggi).],
-)
-
-#grid(
-  columns: (1fr, 1fr),
-  column-gutter: 1em,
-  foto("Atap kavling", h: 4.5cm),
-  foto("Geared DC motor dan sensor infrared", h: 4.5cm),
+  harga(
+    [1], [Geared DC motor], tbd, tbd, tbd,
+    [2], [Sensor infrared], [2], tbd, tbd,
+  ),
 )
 
 == Kavling Source Supply
 
-Bagian ini adalah box di samping kavling yang menyimpan bahan-bahan pendukung
-lingkungan kavling dan memantau ketersediaannya.
-
-#ntk(
-  [Box di samping kavling],
-  lst(
-    [Air dalam tangki],
-    [Pestisida dalam tangki],
-    [Pupuk dalam tangki],
-    [Air pH dalam tangki],
-    [Baking soda dalam tangki],
-    [Cuka dalam tangki],
-    [Hidrogen peroksida (H#sub[2]O#sub[2]) 3% dalam tangki],
-    [Ragi roti (Fermipan)],
+#bagian(
+  tjn(
+    [Lingkungan di dalam kavling membutuhkan suplai bahan pendukung yang tersedia dan terpantau.],
+    [Menyediakan suplai bahan-bahan untuk mendukung lingkungan di dalam kavling.],
   ),
-  lst(
-    [Kadar air dalam tangki],
-    [Kadar pestisida dalam tangki],
-    [Kadar pupuk dalam tangki],
-    [Kadar larutan pupuk dengan air dalam tangki],
-    [Kadar air pH dalam tangki],
-    [Baking soda dalam tangki],
-    [Cuka dalam tangki],
-    [Hidrogen peroksida 3% dalam tangki],
-    [Ragi roti (Fermipan)],
-  ),
-  lst(),
-  lst(
-    [Membunyikan alarm bahwa tangki tertentu kurang atau kosong],
-    [Memasukkan campuran pupuk dengan air lalu mengaduknya],
+  [
+    Komponen: *box di samping kavling*.
+    #foto("Box suplai dan tangki-tangki di samping kavling", h: 5cm)
+  ],
+  teknis(
+    lst(
+      [Air dalam tangki], [Pestisida dalam tangki], [Pupuk dalam tangki],
+      [Air pH dalam tangki], [Baking soda dalam tangki], [Cuka dalam tangki],
+      [Hidrogen peroksida (H#sub[2]O#sub[2]) 3% dalam tangki], [Ragi roti (Fermipan)],
+    ),
+    lst(
+      [Kadar air dalam tangki], [Kadar pestisida dalam tangki], [Kadar pupuk dalam tangki],
+      [Kadar larutan pupuk dengan air dalam tangki], [Kadar air pH dalam tangki],
+      [Baking soda dalam tangki], [Cuka dalam tangki],
+      [Hidrogen peroksida 3% dalam tangki], [Ragi roti (Fermipan)],
+    ),
+    [Tidak ada],
+    lst(
+      [Membunyikan alarm bahwa tangki tertentu kurang atau kosong],
+      [Memasukkan campuran pupuk dengan air lalu mengaduknya],
+    ),
   ),
   tbd,
-  [Menyediakan suplai bahan-bahan untuk mendukung lingkungan di dalam kavling.],
+  tbd,
+  tbd,
+  tbd,
 )
-
-#foto("Box suplai dan tangki-tangki di samping kavling", h: 5cm)
 
 == Kavling ke Lingkungan Internal
 
-Bagian ini menjaga kualitas udara di dalam kavling melalui sisi-sisi kavling.
-
-#ntk(
-  [Sisi-sisi kavling],
-  lst([Suhu], [Kadar oksigen], [Kadar karbon dioksida]),
-  lst(
-    [Suhu],
-    [Kadar oksigen (malam)],
-    [Kadar karbon dioksida (siang)],
-    [Kelembapan udara],
+#bagian(
+  tjn(
+    [Kualitas udara di dalam kavling harus dijaga agar tanaman tumbuh baik.],
+    [Membuat lingkungan udara yang ideal sesuai parameter ideal.],
   ),
-  lst(
-    [Penyemprotan air pada jam-jam tertentu sesuai program],
-    [Penyemprotan pestisida pada jam-jam tertentu sesuai program],
-  ),
-  lst(
-    [Memasukkan udara dari lingkungan luar ke internal kavling],
-    [Penyesuaian kadar oksigen / karbon dioksida],
-    [Penyesuaian kelembapan udara],
-    [Penyaluran gas karbon dioksida saat jam-jam efektif flux matahari],
-    [Penyaluran gas oksigen saat kadar oksigen kurang pada malam hari],
+  [
+    Komponen: *sisi-sisi kavling*.
+    #foto("Sisi-sisi kavling", h: 5cm)
+  ],
+  teknis(
+    lst([Suhu], [Kadar oksigen], [Kadar karbon dioksida]),
+    lst([Suhu], [Kadar oksigen (malam)], [Kadar karbon dioksida (siang)], [Kelembapan udara]),
+    lst(
+      [Penyemprotan air pada jam-jam tertentu sesuai program],
+      [Penyemprotan pestisida pada jam-jam tertentu sesuai program],
+    ),
+    lst(
+      [Memasukkan udara dari lingkungan luar ke internal kavling],
+      [Penyesuaian kadar oksigen / karbon dioksida],
+      [Penyesuaian kelembapan udara],
+      [Penyaluran gas karbon dioksida saat jam-jam efektif flux matahari],
+      [Penyaluran gas oksigen saat kadar oksigen kurang pada malam hari],
+    ),
   ),
   tbd,
-  [Membuat lingkungan udara yang ideal sesuai parameter ideal.],
+  tbd,
+  tbd,
+  tbd,
 )
-
-#foto("Sisi-sisi kavling dan komponen sirkulasi udara", h: 5cm)
 
 == Kavling Pot ke Tanaman
 
-Bagian ini menjaga kondisi tanah di dalam pot tempat tanaman tumbuh.
-
-#ntk(
-  [Pot di dalam kavling],
-  lst([pH tanah], [Kelembapan tanah / kadar air tanah]),
-  lst([pH tanah], [Kelembapan tanah / kadar air tanah]),
-  lst([Pemasukan campuran air dan pupuk ke tanah]),
-  lst([Pemasukan air ke tanah], [Pemasukan cairan pH]),
+#bagian(
+  tjn(
+    [Kondisi tanah di dalam pot harus sesuai kebutuhan tanaman.],
+    [Membuat lingkungan tanah yang ideal sesuai parameter ideal.],
+  ),
+  [
+    Komponen: *pot di dalam kavling*.
+    #foto("Pot tanaman dan sensor tanah", h: 5cm)
+  ],
+  teknis(
+    lst([pH tanah], [Kelembapan tanah / kadar air tanah]),
+    lst([pH tanah], [Kelembapan tanah / kadar air tanah]),
+    lst([Pemasukan campuran air dan pupuk ke tanah]),
+    lst([Pemasukan air ke tanah], [Pemasukan cairan pH]),
+  ),
   tbd,
-  [Membuat lingkungan tanah yang ideal sesuai parameter ideal.],
+  tbd,
+  tbd,
+  tbd,
 )
-
-#foto("Pot tanaman dan sensor tanah", h: 5cm)
 
 == Kavling Interface ke User
 
-Bagian ini adalah box antarmuka di samping kavling yang menampilkan informasi
-kavling dan menerima input status dari pengguna.
-
-#ntk(
-  [Box interface di samping kavling],
-  lst([Status kavling]),
-  lst([Input status kavling]),
-  lst(
-    [Memberikan informasi suhu dalam kavling, kadar karbon dioksida, dan kadar oksigen],
-    [Memberikan informasi kelembapan tanah dan pH di dalam kavling],
-    [Memberikan informasi flux UV matahari],
-    [Memberikan informasi kadar tangki: air, pestisida, pupuk, serta larutan air dan pupuk],
-    [Memberikan informasi aksi yang sedang dilakukan atau idle],
+#bagian(
+  tjn(
+    [Pengamat perlu tahu kondisi kavling, dan status kavling perlu ditentukan.],
+    lst(
+      [Memberi tahu pengamat informasi terkini tentang kavling],
+      [Menentukan keberlangsungan kavling: sedang "Merawat" atau "Panen"],
+    ),
   ),
-  lst([Membuka atap kavling saat status "Panen"]),
+  [
+    Komponen: *box interface di samping kavling*.
+    #foto("Box interface (layar atau tampilan status)", h: 5cm)
+  ],
+  teknis(
+    lst([Status kavling]),
+    lst([Input status kavling]),
+    lst(
+      [Memberikan informasi suhu dalam kavling, kadar karbon dioksida, dan kadar oksigen],
+      [Memberikan informasi kelembapan tanah dan pH di dalam kavling],
+      [Memberikan informasi flux UV matahari],
+      [Memberikan informasi kadar tangki: air, pestisida, pupuk, serta larutan air dan pupuk],
+      [Memberikan informasi aksi yang sedang dilakukan atau idle],
+    ),
+    lst([Membuka atap kavling saat status "Panen"]),
+  ),
   tbd,
-  lst(
-    [Memberi tahu pengamat informasi terkini tentang kavling],
-    [Menentukan keberlangsungan kavling: sedang "Merawat" atau "Panen"],
-  ),
-)
-
-#foto("Box interface (layar atau tampilan status)", h: 5cm)
-
-= Ringkasan Komponen Elektronik
-
-Komponen elektronik yang sudah ditentukan sejauh ini adalah sebagai berikut.
-Komponen untuk bagian lain akan ditambahkan seiring perancangan.
-
-#table(
-  columns: (auto, 1fr, 1fr),
-  inset: 7pt,
-  stroke: 0.5pt + luma(160),
-  fill: (x, y) => if y == 0 { luma(225) } else { none },
-  [*No*], [*Komponen*], [*Digunakan oleh*],
-  [1], [Geared DC motor], [Atap kavling],
-  [2], [Sensor infrared #sym.times 2], [Atap kavling],
-)
-
-#grid(
-  columns: (1fr, 1fr),
-  column-gutter: 1em,
-  foto("Geared DC motor", h: 4.5cm),
-  foto("Sensor infrared", h: 4.5cm),
+  tbd,
+  tbd,
+  tbd,
 )
 
 = Penutup

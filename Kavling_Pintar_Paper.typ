@@ -1,39 +1,92 @@
 // ============================================================
 //  KAVLING PINTAR — Paper gambaran besar sistem
 //  Compile: typst compile kavling-pintar.typ
-//  Ganti placeholder foto dengan: image("foto/nama-file.jpg", width: 100%)
+//  Ganti placeholder foto dengan: foto("Caption", isi: image("foto/nama-file.jpg", width: 100%))
 // ============================================================
 
-#set document(title: "Kavling Pintar", author: "Faiz Hannan Hakim")
+// ---------- Konfigurasi dasar ----------
+
+#let judul = "Kavling Pintar"
+#let penulis = "Faiz Hannan Hakim"
+#let versi = "Draf Kv-001"
+
+// Palet warna (satu aksen saja supaya tetap rapi)
+#let accent = rgb("#2E6B3F")
+#let accent-soft = accent.lighten(90%)
+#let ink = luma(30)
+#let muted = luma(110)
+
+#let bulan = (
+  "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+  "Juli", "Agustus", "September", "Oktober", "November", "Desember",
+)
+#let tanggal = {
+  let d = datetime.today()
+  [#d.day() #bulan.at(d.month() - 1) #d.year()]
+}
+
+#set document(title: judul, author: penulis)
 #set page(
   paper: "a4",
-  margin: (x: 2.5cm, y: 2.5cm),
-  numbering: "1",
+  margin: (x: 2.5cm, top: 2.8cm, bottom: 2.5cm),
+  header: [
+    #set text(size: 9pt, fill: muted)
+    #judul #h(1fr) #versi
+    #v(-0.55em)
+    #line(length: 100%, stroke: 0.4pt + luma(200))
+  ],
   footer: context [
-    #set text(size: 9pt, fill: gray)
-    Kavling Pintar #h(1fr) #counter(page).display()
+    #set text(size: 9pt, fill: muted)
+    #align(center, counter(page).display())
   ],
 )
-#set text(font: "New Computer Modern", size: 11pt, lang: "id")
-#set par(justify: true, leading: 0.65em)
-#set heading(numbering: "1.1")
-#show heading.where(level: 1): set text(size: 14pt)
-#show heading: set block(above: 1.4em, below: 0.8em)
-#set figure(supplement: "Gambar")
-#show figure.caption: set text(size: 9.5pt)
+#set text(font: "New Computer Modern", size: 11pt, lang: "id", fill: ink)
+#set par(justify: true, leading: 0.7em, spacing: 1.1em)
+
+// ---------- Heading ----------
+
+// Level 1-2: 1, 1.1 | Level 3: nomor poin 1., 2., ... (poin 1-7 tiap bagian)
+#set heading(numbering: (..n) => {
+  let p = n.pos()
+  if p.len() == 3 { str(p.last()) + "." } else { numbering("1.1", ..p) }
+})
+#show heading.where(level: 1): set text(size: 16pt, fill: accent)
+#show heading.where(level: 2): set text(size: 13pt, fill: accent)
+#show heading.where(level: 3): set text(size: 11pt)
+#show heading.where(level: 1): it => block(
+  width: 100%,
+  above: 2em,
+  below: 1em,
+  stroke: (bottom: 0.7pt + accent),
+  inset: (bottom: 5pt),
+  it,
+)
+#show heading.where(level: 2): set block(above: 1.6em, below: 0.8em)
+#show heading.where(level: 3): set block(above: 1.2em, below: 0.6em)
+
+// ---------- Figure & tabel ----------
+
+#show figure: set block(breakable: false, above: 1.2em, below: 1.2em)
+#show figure.caption: set text(size: 9.5pt, fill: muted)
+#set figure.caption(separator: [. ])
+#show figure.where(kind: table): set figure.caption(position: top)
+#show table: set par(justify: false)
 
 // ---------- Helper ----------
 
-// Placeholder foto: nanti ganti isi `foto(...)` dengan image(...)
+// Placeholder foto: nanti isi `isi:` dengan image(...)
 #let foto(caption, h: 5cm, isi: none) = figure(
+  kind: image,
+  supplement: [Gambar],
   if isi == none {
     rect(
       width: 100%,
       height: h,
-      stroke: (paint: gray, dash: "dashed"),
+      radius: 3pt,
+      stroke: (paint: luma(170), dash: "dashed"),
       fill: luma(247),
     )[
-      #align(center + horizon, text(fill: gray, size: 10pt)[Tempat foto komponen])
+      #align(center + horizon, text(fill: muted, size: 10pt)[Tempat foto komponen])
     ]
   } else { isi },
   caption: caption,
@@ -43,60 +96,156 @@
 #let lst(..items) = {
   let xs = items.pos()
   if xs.len() == 0 [—] else {
-    list(tight: true, marker: [•], indent: 0pt, body-indent: 6pt, ..xs)
+    list(
+      tight: true,
+      marker: text(fill: accent)[•],
+      indent: 0pt,
+      body-indent: 6pt,
+      ..xs,
+    )
   }
 }
 
-#let tbd = text(fill: gray, style: "italic")[belum ditentukan]
+#let tbd = text(fill: muted, style: "italic")[Belum ditentukan]
 
-// Tabel NTK satu subsistem
-#let ntk(comp, ideal, detect, pasif, reaktif, elek, goal) = table(
-  columns: (3.4cm, 1fr),
-  inset: 7pt,
-  stroke: 0.5pt + luma(160),
-  fill: (x, y) => if x == 0 { luma(236) } else { none },
-  [*Component*], comp,
-  [*Parameter Ideal*], ideal,
-  [*Pendeteksian*], detect,
-  [*Aksi Pasif*], pasif,
-  [*Aksi Reaktif*], reaktif,
-  [*Attributes Electronic*], elek,
+// Tabel dengan baris header (gaya garis horizontal saja)
+#let tabel(columns: (auto, 1fr), align: left, ..rows) = table(
+  columns: columns,
+  align: align,
+  inset: (x: 8pt, y: 7pt),
+  stroke: (x, y) => (
+    top: if y == 0 { 1pt + accent } else { none },
+    bottom: if y == 0 { 0.6pt + accent } else { 0.4pt + luma(215) },
+  ),
+  fill: (x, y) => if y == 0 { accent-soft } else { none },
+  ..rows,
+  table.hline(stroke: 1pt + accent),
+)
+
+// Tabel label-isi (kolom pertama = label)
+#let tbl(..rows) = block(breakable: false, table(
+  columns: (4cm, 1fr),
+  align: left,
+  inset: (x: 8pt, y: 7pt),
+  stroke: (x, y) => (
+    top: if y == 0 { 1pt + accent } else { none },
+    bottom: 0.4pt + luma(215),
+  ),
+  fill: (x, y) => if x == 0 { accent-soft } else { none },
+  ..rows,
+  table.hline(stroke: 1pt + accent),
+))
+
+// Poin 1
+#let tjn(masalah, goal) = tbl(
+  [*Masalah*], masalah,
   [*Goal*], goal,
 )
 
-// ---------- Judul ----------
+// Poin 3
+#let teknis(param, deteksi, pasif, reaktif) = tbl(
+  [*Parameter ideal*], param,
+  [*Pendeteksian*], deteksi,
+  [*Aksi pasif*], pasif,
+  [*Aksi reaktif*], reaktif,
+)
 
-#align(center)[
-  #v(1cm)
-  #text(size: 24pt, weight: "bold")[Kavling Pintar]
-  #v(0.3em)
-  #text(size: 13pt)[Rancangan Sistem Kavling Otomatis untuk Perawatan Tanaman]
-  #v(0.8em)
-  Faiz Hannan \
-  #text(size: 10pt, fill: gray)[Draf Kv-001]
-  #v(1cm)
+// Poin 7
+#let harga(..baris) = tabel(
+  columns: (auto, 1fr, auto, auto, auto),
+  align: (center, left, center, right, right),
+  [*No*], [*Komponen*], [*Jumlah*], [*Harga satuan*], [*Subtotal*],
+  ..baris,
+)
+
+// Kerangka 7 poin untuk setiap bagian sistem
+#let bagian(p1, p2, p3, p4, p5, p6, p7) = {
+  [=== Tujuan dan Masalah]
+  p1
+  [=== Penjelasan Visual]
+  block(breakable: false, p2)
+  [=== Teknis Bagian]
+  p3
+  [=== Pendalaman Bagian]
+  p4
+  [=== Material Penyusun Komponen]
+  p5
+  [=== Elektronika yang Bekerja]
+  p6
+  [=== Rincian Komponen dan Harga]
+  p7
+}
+
+// Kartu ciri fisik tanaman
+#let ciri(judul, ket) = block(
+  stroke: (left: 2pt + accent),
+  inset: (left: 9pt, y: 3pt),
+)[
+  *#judul* \
+  #text(size: 9.5pt, fill: muted)[#ket]
 ]
 
-#block(inset: (x: 1cm))[
-  #align(center)[*Abstrak*]
-  #v(0.2em)
-  #set par(justify: true)
-  Kavling Pintar adalah rancangan kavling yang akan mengjaga tanaman yang ada di dalam nya, kavling berisi tanaman beserta pot-potnya
+// ============================================================
+//  SAMPUL
+// ============================================================
+
+#page(header: none, footer: none, margin: (x: 3cm, y: 3cm))[
+  #set par(justify: false)
+  #text(size: 10pt, weight: "bold", fill: accent, tracking: 2pt)[DOKUMEN RANCANGAN SISTEM]
+  #v(1fr)
+  #text(size: 40pt, weight: "bold")[#judul]
+  #v(0.5em)
+  #line(length: 4cm, stroke: 3pt + accent)
+  #v(0.8em)
+  #text(size: 15pt, fill: luma(70))[Rancangan Sistem Kavling Otomatis \ untuk Perawatan Tanaman]
+  #v(1fr)
+  #grid(
+    columns: (2.6cm, 1fr),
+    row-gutter: 0.8em,
+    text(fill: muted)[Penulis], penulis,
+    text(fill: muted)[Versi], versi,
+    text(fill: muted)[Tanggal], tanggal,
+  )
+]
+#counter(page).update(1)
+
+// ============================================================
+//  ABSTRAK & DAFTAR ISI
+// ============================================================
+
+#block(
+  width: 100%,
+  fill: accent-soft,
+  radius: 3pt,
+  inset: (x: 0.9cm, y: 0.7cm),
+)[
+  #text(weight: "bold", fill: accent)[Abstrak]
+  #v(0.3em)
+  #set text(size: 10.5pt)
+  Kavling Pintar adalah rancangan kavling yang berisi tanaman beserta pot-potnya
   dan bertugas merawat tanaman tersebut secara mandiri. Kavling dirancang untuk
   memanfaatkan sumber daya di sekitarnya, seperti cahaya matahari, udara luar,
   dan air, seefisien mungkin. Sistem dibagi menjadi lima bagian: atap,
   suplai bahan, lingkungan udara internal, pot tanaman, dan antarmuka
-  pengguna. Setiap bagian dijelaskan dengan format NTK(Need To Know), yaitu
+  pengguna. Setiap bagian dijelaskan dengan format NTK (_Need To Know_), yaitu
   komponen, parameter ideal, pendeteksian, aksi pasif, aksi reaktif, tujuan,
   dan atribut elektronik. Dokumen ini adalah gambaran besar; foto komponen
   dan nilai parameter akan dilengkapi pada tahap berikutnya.
+  #v(0.4em)
+  #text(size: 9.5pt)[*Kata kunci:* kavling pintar, otomasi tanaman, sensor, IoT]
 ]
 
-#v(0.5cm)
+#v(0.8cm)
+#show outline.entry.where(level: 1): it => {
+  v(0.5em, weak: true)
+  strong(it)
+}
 #outline(title: "Daftar Isi", indent: 1.2em, depth: 2)
 #pagebreak()
 
-// ---------- Isi ----------
+// ============================================================
+//  ISI
+// ============================================================
 
 = Pendahuluan
 
@@ -114,41 +263,28 @@ Kavling Pintar adalah kavling yang di dalamnya diletakkan tanaman beserta
 pot-potnya. Kavling bertugas memelihara tanaman di dalamnya dan harus pandai
 memanfaatkan sumber daya di sekitarnya seefisien mungkin.
 
-== NTK (Need To Know)
+== NTK (_Need To Know_)
 
-Setiap bagian sistem dijelaskan dengan tujuh elemen berikut.
+Setiap bagian sistem dijelaskan dengan tujuh elemen pada @tbl-ntk.
 
-#table(
-  columns: (4cm, 1fr),
-  inset: 7pt,
-  stroke: 0.5pt + luma(160),
-  fill: (x, y) => if y == 0 { luma(225) } else { none },
-  [*Elemen*], [*Pengertian*],
-  [Component], [Komponen yang bertugas atas suatu hal.],
-  [Parameter Ideal], [Parameter yang nanti ditentukan di dalam program.],
-  [Pendeteksian],
-  [Pembacaan dinamika lingkungan yang dijadikan parameter penilaian.],
+#figure(
+  kind: table,
+  supplement: [Tabel],
+  caption: [Tujuh elemen NTK],
+  tabel(
+    columns: (4cm, 1fr),
+    [*Elemen*], [*Pengertian*],
+    [Component], [Komponen yang bertugas atas suatu hal.],
+    [Parameter Ideal], [Parameter yang nanti ditentukan di dalam program.],
+    [Pendeteksian], [Pembacaan dinamika lingkungan yang dijadikan parameter penilaian.],
+    [Aksi Pasif], [Aksi yang pasti dilakukan tanpa bergantung pada pendeteksian parameter.],
+    [Aksi Reaktif], [Aksi yang merupakan hasil keputusan dari pendeteksian parameter.],
+    [Goal], [Tujuan dari bagian yang dimaksud.],
+    [Attributes Electronic], [Komponen robotik yang digunakan oleh component.],
+  ),
+) <tbl-ntk>
 
-  [Aksi Pasif],
-  [Aksi yang pasti dilakukan tanpa bergantung pada pendeteksian parameter.],
-
-  [Aksi Reaktif], [Aksi yang merupakan hasil keputusan dari pendeteksian parameter.],
-  [Goal], [Tujuan dari bagian yang dimaksud.],
-  [Attributes Electronic], [Komponen robotik yang digunakan oleh component.],
-)
-
-#linebreak()
-#linebreak()
-#linebreak()
-#linebreak()
-#linebreak()
-#linebreak()
-#linebreak()
-#linebreak()
-#linebreak()
-#linebreak()
-#linebreak()
-#linebreak()
+#pagebreak(weak: true)
 
 = Tanaman Target
 
@@ -165,154 +301,86 @@ sayuran daun (hortikultura semusim):
   ("Pakcoy", "Brassica rapa subsp. chinensis", "jpg"),
 )
 
-#grid(
+#block(breakable: false, grid(
   columns: (1fr, 1fr, 1fr),
   column-gutter: 1em,
-  row-gutter: 0.99em,
+  row-gutter: 1em,
   ..tanaman.enumerate(start: 1).map(((i, t)) => {
     let (nama, ilmiah, ext) = t
     align(center)[
-      #image("foto/" + lower(nama) + "." + ext, width: 100%, height: 3.5cm, fit: "cover")
+      #box(clip: true, radius: 3pt)[
+        #image("foto/" + lower(nama) + "." + ext, width: 100%, height: 3cm, fit: "cover")
+      ]
       #v(0.2em)
       *#i. #nama* \
       #text(size: 9.5pt, emph(ilmiah))
     ]
   }),
-)
+))
 
-#linebreak()
+#v(0.6em)
 
-Demikian dapat diklasifikasikan bahwa kavling pintar akan merawat tanaman-tanaman dengan ciri fisik sebagai berikut:
+Dengan demikian, kavling pintar akan merawat tanaman dengan ciri fisik berikut:
 
-#v(0.5em)
+#v(0.3em)
 
-#grid(
+#block(breakable: false, grid(
   columns: (1fr, 1fr),
   column-gutter: 2em,
-  row-gutter: 0.8em,
-  [*• Batang pendek dan lunak* \ #text(size: 9.5pt, fill: luma(100))[Tidak berkayu dan bertekstur basah/berair]],
-  [*• Kanopi rendah & mendatar* \ #text(size: 9.5pt, fill: luma(100))[Tumbuh melebar ke samping, tidak menjulang]],
-  [*• Dominasi daun rimbun* \ #text(size: 9.5pt, fill: luma(100))[Fokus visual pada helai daun yang lebat]],
-  [*• Akar di permukaan tanah* \ #text(size: 9.5pt, fill: luma(100))[Berupa perakaran serabut yang dangkal]]
-)
+  row-gutter: 1em,
+  ciri([Batang pendek dan lunak], [Tidak berkayu dan bertekstur basah/berair]),
+  ciri([Kanopi rendah dan mendatar], [Tumbuh melebar ke samping, tidak menjulang]),
+  ciri([Dominasi daun rimbun], [Fokus visual pada helai daun yang lebat]),
+  ciri([Akar di permukaan tanah], [Berupa perakaran serabut yang dangkal]),
+))
 
-
-
-#linebreak()
-#linebreak()
-#linebreak()
-#linebreak()
-#linebreak()
-#linebreak()
-#linebreak()
-#linebreak()
-#linebreak()
-#linebreak()
-#linebreak()
-#linebreak()
-#linebreak()
-
+#pagebreak(weak: true)
 
 = Gambaran Umum Sistem
 
 Kavling Pintar terdiri dari lima bagian yang saling berhubungan. Atap
 melindungi tanaman dari lingkungan luar, box suplai menyediakan bahan,
 sisi-sisi kavling menjaga kualitas udara, pot menjaga kualitas tanah, dan box
-antarmuka menyampaikan informasi kepada pengamat.
+antarmuka menyampaikan informasi kepada pengamat (@tbl-bagian).
 
-#table(
-  columns: (auto, 1fr, 1fr),
-  inset: 7pt,
-  stroke: 0.5pt + luma(160),
-  fill: (x, y) => if y == 0 { luma(225) } else { none },
-  [*No*], [*Bagian*], [*Component*],
-  [1], [Kavling ke Lingkungan Luar], [Atap Kavling],
-  [2], [Kavling Source Supply], [Box di samping kavling],
-  [3], [Kavling ke Lingkungan Internal], [Sisi-sisi kavling],
-  [4], [Kavling Pot ke Tanaman], [Pot di dalam kavling],
-  [5], [Kavling Interface ke User], [Box interface di samping kavling],
-)
-
-#v(0.5em)
+#figure(
+  kind: table,
+  supplement: [Tabel],
+  caption: [Lima bagian sistem Kavling Pintar],
+  tabel(
+    columns: (auto, 1fr, 1fr),
+    align: (center, left, left),
+    [*No*], [*Bagian*], [*Component*],
+    [1], [Kavling ke Lingkungan Luar], [Atap Kavling],
+    [2], [Kavling Source Supply], [Box di samping kavling],
+    [3], [Kavling ke Lingkungan Internal], [Sisi-sisi kavling],
+    [4], [Kavling Pot ke Tanaman], [Pot di dalam kavling],
+    [5], [Kavling Interface ke User], [Box interface di samping kavling],
+  ),
+) <tbl-bagian>
 
 #grid(
   columns: (1fr, 1fr),
   column-gutter: 1em,
   foto(
     "Tampak penuh Kavling Pintar",
-    isi: image("foto/Tampak_Full.png", width: 100%, height: 7cm, fit: "contain"),
+    isi: image("foto/Tampak_Full.png", width: 100%, height: 5cm, fit: "contain"),
   ),
   foto(
     "Tampak rangka Kavling Pintar",
-    isi: image("foto/Tampak_Rangka.png", width: 100%, height: 7cm, fit: "contain"),
+    isi: image("foto/Tampak_Rangka.png", width: 100%, height: 5cm, fit: "contain"),
   ),
 )
 
-#linebreak()
-#linebreak()
-#linebreak()
-#linebreak()
-#linebreak()
-#linebreak()
-#linebreak()
-#linebreak()
-#linebreak()
-#linebreak()
-#linebreak()
-#linebreak()
-
-#let tbd = text(fill: luma(120), [_tbd_])
-
-#let tbl(..rows) = table(
-  columns: (auto, 1fr),
-  inset: 7pt,
-  stroke: 0.5pt + luma(160),
-  fill: (x, y) => if x == 0 { luma(235) } else { none },
-  ..rows,
-)
-
-// poin 1
-#let tjn(masalah, goal) = tbl(
-  [*Masalah*], masalah,
-  [*Goal*], goal,
-)
-
-// poin 3
-#let teknis(param, deteksi, pasif, reaktif) = tbl(
-  [*Parameter ideal*], param,
-  [*Pendeteksian*], deteksi,
-  [*Aksi pasif*], pasif,
-  [*Aksi reaktif*], reaktif,
-)
-
-// poin 7
-#let harga(..baris) = table(
-  columns: (auto, 1fr, auto, auto, auto),
-  inset: 7pt,
-  stroke: 0.5pt + luma(160),
-  fill: (x, y) => if y == 0 { luma(225) } else { none },
-  [*No*], [*Komponen*], [*Jumlah*], [*Harga satuan*], [*Subtotal*],
-  ..baris,
-)
-
-#let bagian(tujuan, visual, teknis, pendalaman, material, elektronika, rincian) = {
-  [=== Tujuan dan Masalah]
-  tujuan
-  [=== Penjelasan Visual]
-  visual
-  [=== Teknis Bagian]
-  teknis
-  [=== Pendalaman Bagian]
-  pendalaman
-  [=== Material Penyusun Komponen]
-  material
-  [=== Elektronika yang Bekerja]
-  elektronika
-  [=== Rincian Komponen dan Harga]
-  rincian
-}
+#pagebreak(weak: true)
 
 = Rincian Bagian Sistem
+
+Setiap bagian sistem dijelaskan dengan tujuh poin yang seragam: tujuan dan
+masalah, penjelasan visual, teknis bagian, pendalaman bagian, material
+penyusun komponen, elektronika yang bekerja, serta rincian komponen dan
+harga. Poin yang belum ditentukan ditandai _Belum ditentukan_ dan akan
+dilengkapi pada tahap berikutnya.
 
 == Kavling ke Lingkungan Luar
 

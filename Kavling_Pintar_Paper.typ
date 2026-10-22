@@ -351,13 +351,20 @@ Dengan demikian, kavling pintar akan merawat tanaman dengan ciri fisik berikut:
 
 #pagebreak(weak: true)
 
-= Gambaran Umum Sistem
+= Gambaran Sistem
 
-Kavling Pintar terdiri dari lima bagian yang saling berhubungan. Atap
-melindungi tanaman dari lingkungan luar, box suplai menyediakan bahan,
-sisi-sisi kavling menjaga kualitas udara, pot menjaga kualitas tanah, dan box
+Kavling Pintar terdiri dari 3 Bagian Besar yakni: Kavling, Box Penyedia Sumber Daya Kavling, Box Interface Data Kavling. 
+dengan rincian bagian: Kavling( Atap Kavling
+melindungi tanaman dari lingkungan luar, Box didalam Kavling dan Sisi Luar Kavling untuk melindungi tanaman dari lingkup luar yang 
+chaos dan tidak terprediksi dan juga mengatur suhu di dalam kavling, Pot di dalam Kavling untuk mengondisikan keadaan tanah), box suplai menyediakan bahan,
+dan box
 antarmuka menyampaikan informasi kepada pengamat (@tbl-bagian).
 
+== Sistem Kavling
+
+Kami akan memaparkan bagaimana sistem kavling itu terdiri dan juga bagaimana skema teknis dan rancangan skematiknya 
+
+#linebreak()
 #figure(
   kind: table,
   supplement: [Tabel],
@@ -365,18 +372,15 @@ antarmuka menyampaikan informasi kepada pengamat (@tbl-bagian).
   tabel(
     columns: (auto, 1fr, 1fr),
     align: (center, left, left),
-    [*No*], [*Bagian*], [*Component*],
+    [*No*], [*Bagian*], [*Bagian*],
     [1], [Kavling ke Lingkungan Luar], [Atap Kavling],
-    [2], [Kavling Source Supply], [Box di samping kavling],
-    [3], [Kavling ke Lingkungan Internal], [Sisi-sisi kavling],
-    [4], [Kavling Pot ke Tanaman], [Pot di dalam kavling],
-    [5], [Kavling Interface ke User], [Box interface di samping kavling],
+    [2], [Kavling ke Lingkungan Internal], [Sisi-sisi kavling],
+    [3], [Kavling Pot ke Tanaman], [Pot di dalam kavling],
   ),
 ) <tbl-bagian>
-
 #linebreak()
   #foto(
-    "Tampak penuh Kavling Pintar",
+    "Tampak penuh Kavling",
     isi: image("foto/Tampak_Full.png", width: 100%, height: 6cm, fit: "contain"),
   ),
 
@@ -384,6 +388,31 @@ antarmuka menyampaikan informasi kepada pengamat (@tbl-bagian).
     "Tampak rangka Kavling Pintar",
     isi: image("foto/Tampak_Rangka.png", width: 100%, height: 6cm, fit: "contain"),
   ),
+
+Foto diatas adalah foto dari rancangan bentuk kavling secara gambaran besar dimana kami juga akan merincikan selanjutnya 
+ukuran, volume dan skematik teknis dari rancangan kavling 
+
+#linebreak()
+
+ #foto(
+    "Kavling Luar",
+    isi: image("foto/Skematik_Kavling_Luar.png", width: 100%, height: 6cm, fit: "contain"),
+  ),
+
+#figure(
+  kind: table,
+  supplement: [Tabel],
+  caption: [Rancangan Geometri Dan Struktur Dari Kavling Dalam],
+ 
+  tabel(
+    columns: (auto, 1fr, 2fr),
+    align: (center, center, left),
+     [*No*], [*Keterangan*], [*Nilai*],
+     [1],  [Dimensi], [ 266(panjang) x 186(lebar) x 120(tinggi) cm ],
+     [2], [Keliling], [ 904 cm],
+     [3], [Volume], [5.937.120 cm³]
+  )
+)
 
 #pagebreak(weak: true)
 

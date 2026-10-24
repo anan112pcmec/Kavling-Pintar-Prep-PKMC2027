@@ -48,14 +48,10 @@
 
 // ---------- Heading ----------
 
-// Level 1-2: 1, 1.1 | Level 3: nomor poin 1., 2., ... (poin 1-7 tiap bagian)
-#set heading(numbering: (..n) => {
-  let p = n.pos()
-  if p.len() == 3 { str(p.last()) + "." } else { numbering("1.1", ..p) }
-})
+#set heading(numbering: "1.1.1")
 #show heading.where(level: 1): set text(size: 16pt, fill: accent)
 #show heading.where(level: 2): set text(size: 13pt, fill: accent)
-#show heading.where(level: 3): set text(size: 11pt)
+#show heading.where(level: 3): set text(size: 11.5pt, fill: accent)
 #show heading.where(level: 1): it => block(
   width: 100%,
   above: 2em,
@@ -160,30 +156,47 @@
   [*Aksi reaktif*], reaktif,
 )
 
-// Poin 7
-#let harga(..baris) = tabel(
-  columns: (auto, 1fr, auto, auto, auto),
-  align: (center, left, center, right, right),
-  [*No*], [*Komponen*], [*Jumlah*], [*Harga satuan*], [*Subtotal*],
-  ..baris,
-)
+// ---------- Template satu bagian sistem ----------
+// Tiap bagian: 1) Masalah dan Goal  2) Penjelasan Visual
+//              3) Teknis Bagian     4) Penjelasan Komponen
+//                 (penjelasan -> teknis komponen -> bahan komponen)
 
-// Kerangka 7 poin untuk setiap bagian sistem
-#let bagian(p1, p2, p3, p4, p5, p6, p7) = {
-  [=== Tujuan dan Masalah]
-  p1
-  [=== Penjelasan Visual]
-  block(breakable: false, p2)
-  [=== Teknis Bagian]
-  p3
-  [=== Pendalaman Bagian]
-  p4
-  [=== Material Penyusun Komponen]
-  p5
-  [=== Elektronika yang Bekerja]
-  p6
-  [=== Rincian Komponen dan Harga]
-  p7
+// Judul poin bernomor 1-4 (di-reset di setiap bagian)
+#let poin(judul) = {
+  counter("poin").step()
+  block(above: 1.3em, below: 0.6em, sticky: true)[
+    #context text(weight: "bold", fill: accent2)[#counter("poin").display().]
+    #text(weight: "bold")[#judul]
+  ]
+}
+
+// Sub-label di dalam poin 4 (jangan dinamai `sub`, bentrok dengan subskrip H#sub[2]O)
+#let sublabel(judul) = block(above: 1em, below: 0.5em, sticky: true)[
+  #text(fill: accent2, weight: "bold")[›] #text(weight: "bold", style: "italic")[#judul]
+]
+
+// Poin 4: satu komponen (nama opsional kalau satu bagian punya beberapa komponen)
+#let komponen(nama: none, penjelasan, teknis, bahan) = {
+  if nama != none {
+    block(above: 1em, below: 0.4em, sticky: true, text(weight: "bold", fill: accent)[#nama])
+  }
+  penjelasan
+  sublabel[Teknis komponen]
+  teknis
+  sublabel[Bahan komponen]
+  bahan
+}
+
+#let bagian(masalah-goal, visual, teknis-bagian, komponen-bagian) = {
+  counter("poin").update(0)
+  poin[Masalah dan Goal]
+  masalah-goal
+  poin[Penjelasan Visual]
+  block(breakable: false, visual)
+  poin[Teknis Bagian]
+  teknis-bagian
+  poin[Penjelasan Komponen]
+  komponen-bagian
 }
 
 // Kartu ciri fisik tanaman
@@ -240,9 +253,8 @@
   Kavling Pintar adalah rancangan kavling yang berisi tanaman beserta pot-potnya
   dan bertugas merawat tanaman tersebut secara mandiri. Kavling dirancang untuk
   memanfaatkan sumber daya di sekitarnya, seperti cahaya matahari, udara luar,
-  dan air, seefisien mungkin. Sistem dibagi menjadi lima bagian: atap,
-  suplai bahan, lingkungan udara internal, pot tanaman, dan antarmuka
-  pengguna. Setiap bagian dijelaskan dengan format NTK (_Need To Know_), yaitu
+  dan air, seefisien mungkin. Sistem terdiri dari tiga bagian besar: kavling
+  (atap, badan, dan pot), box suplai bahan, dan box antarmuka pengguna. Setiap bagian dijelaskan dengan format NTK (_Need To Know_), yaitu
   komponen, parameter ideal, pendeteksian, aksi pasif, aksi reaktif, tujuan,
   dan atribut elektronik. Dokumen ini adalah gambaran besar; foto komponen
   dan nilai parameter akan dilengkapi pada tahap berikutnya.
@@ -255,7 +267,7 @@
   v(0.5em, weak: true)
   strong(it)
 }
-#outline(title: "Daftar Isi", indent: 1.2em, depth: 2)
+#outline(title: "Daftar Isi", indent: 1.2em, depth: 3)
 #pagebreak()
 
 // ============================================================
@@ -353,105 +365,145 @@ Dengan demikian, kavling pintar akan merawat tanaman dengan ciri fisik berikut:
 
 = Gambaran Sistem
 
-Kavling Pintar terdiri dari 3 Bagian Besar yakni: Kavling, Box Penyedia Sumber Daya Kavling, Box Interface Data Kavling. 
-dengan rincian bagian: Kavling( Atap Kavling
-melindungi tanaman dari lingkungan luar, Box didalam Kavling dan Sisi Luar Kavling untuk melindungi tanaman dari lingkup luar yang 
-chaos dan tidak terprediksi dan juga mengatur suhu di dalam kavling, Pot di dalam Kavling untuk mengondisikan keadaan tanah), box suplai menyediakan bahan,
-dan box
+Kavling Pintar terdiri dari tiga bagian besar: *kavling*, *box penyedia sumber
+daya kavling* (Kavling Source Supply), dan *box interface data kavling*
+(Kavling Interface). Kavling sendiri dibagi menjadi tiga bagian: atap kavling
+yang melindungi tanaman dari lingkungan luar, badan kavling (sisi-sisi
+kavling) yang melindungi tanaman dari kondisi luar yang tidak terprediksi
+sekaligus mengatur suhu di dalam kavling, dan pot kavling yang mengondisikan
+keadaan tanah. Box suplai menyediakan bahan-bahan pendukung, dan box
 antarmuka menyampaikan informasi kepada pengamat (@tbl-bagian).
 
 == Sistem Kavling
 
-Kami akan memaparkan bagaimana sistem kavling itu terdiri dan juga bagaimana skema teknis dan rancangan skematiknya 
+Bagian ini memaparkan bagaimana sistem kavling tersusun, beserta skema teknis
+dan rancangan skematiknya.
 
-#linebreak()
 #figure(
   kind: table,
   supplement: [Tabel],
-  caption: [Lima bagian sistem Kavling Pintar],
+  caption: [Pembagian bagian sistem Kavling Pintar],
   tabel(
-    columns: (auto, 1fr, 1fr),
-    align: (center, left, left),
-    [*No*], [*Bagian*], [*Bagian*],
-    [1], [Kavling ke Lingkungan Luar], [Atap Kavling],
-    [2], [Kavling ke Lingkungan Internal], [Sisi-sisi kavling],
-    [3], [Kavling Pot ke Tanaman], [Pot di dalam kavling],
+    columns: (auto, 1fr, 1fr, 1.2fr),
+    align: (center, left, left, left),
+    [*No*], [*Kelompok*], [*Bagian*], [*Padanan NTK*],
+    [1], [Kavling], [Atap Kavling], [Kavling ke Lingkungan Luar],
+    [2], [Kavling], [Badan Kavling], [Kavling ke Lingkungan Internal],
+    [3], [Kavling], [Pot Kavling], [Kavling Pot ke Tanaman],
+    [4], [Box penyedia sumber daya], [Box di samping kavling], [Kavling Source Supply],
+    [5], [Box interface data], [Box interface di samping kavling], [Kavling Interface ke User],
   ),
 ) <tbl-bagian>
-#linebreak()
-  #foto(
+
+#grid(
+  columns: (1fr, 1fr),
+  column-gutter: 1em,
+  foto(
     "Tampak penuh Kavling",
-    isi: image("foto/Tampak_Full.png", width: 100%, height: 6cm, fit: "contain"),
+    isi: image("foto/Tampak_Full.png", width: 100%, height: 5.5cm, fit: "contain"),
   ),
-
-  #foto(
-    "Tampak rangka Kavling Pintar",
-    isi: image("foto/Tampak_Rangka.png", width: 100%, height: 6cm, fit: "contain"),
+  foto(
+    "Tampak rangka Kavling",
+    isi: image("foto/Tampak_Rangka.png", width: 100%, height: 5.5cm, fit: "contain"),
   ),
-
-Foto diatas adalah foto dari rancangan bentuk kavling secara gambaran besar dimana kami juga akan merincikan selanjutnya 
-ukuran, volume dan skematik teknis dari rancangan kavling 
-
-#linebreak()
-
- #foto(
-    "Kavling Luar",
-    isi: image("foto/Skematik_Kavling_Luar.png", width: 100%, height: 6cm, fit: "contain"),
-  ),
-
-#figure(
-  kind: table,
-  supplement: [Tabel],
-  caption: [Rancangan Geometri Dan Struktur Dari Kavling Dalam],
- 
-  tabel(
-    columns: (auto, 1fr, 2fr),
-    align: (center, center, left),
-     [*No*], [*Keterangan*], [*Nilai*],
-     [1],  [Dimensi], [ 266(panjang) x 186(lebar) x 120(tinggi) cm ],
-     [2], [Keliling], [ 904 cm],
-     [3], [Volume], [5.937.120 cm³]
-  )
 )
 
-#pagebreak(weak: true)
+Gambar di atas adalah rancangan bentuk kavling secara garis besar. Ukuran,
+volume, dan skematik teknis kavling dirinci pada bagian berikutnya.
 
-= Rincian Bagian Sistem
+#foto(
+  "Kavling Luar",
+  isi: image("foto/Skematik_Kavling_Luar.png", width: 100%, height: 6cm, fit: "contain"),
+)
 
-Setiap bagian sistem dijelaskan dengan tujuh poin yang seragam: tujuan dan
-masalah, penjelasan visual, teknis bagian, pendalaman bagian, material
-penyusun komponen, elektronika yang bekerja, serta rincian komponen dan
-harga. Poin yang belum ditentukan ditandai _Belum ditentukan_ dan akan
-dilengkapi pada tahap berikutnya.
-
-== Kavling ke Lingkungan Luar
+=== Atap Kavling (Kavling ke Lingkungan Luar)
 
 #bagian(
   tjn(
     [Tanaman di dalam kavling terancam hujan dan flux matahari yang terlalu tinggi.],
     [Menjaga tanaman di dalam kavling dari gangguan lingkungan luar (hujan, indeks matahari tinggi).],
   ),
-  [
-    Komponen: *atap kavling*.
-    #grid(
-      columns: (1fr, 1fr),
-      column-gutter: 1em,
-      foto("Atap kavling", h: 4.5cm),
-      foto("Geared DC motor dan sensor infrared", h: 4.5cm),
-    )
-  ],
+  grid(
+    columns: (1fr, 1fr),
+    column-gutter: 1em,
+    foto("Atap kavling", h: 4.5cm),
+    foto("Geared DC motor dan sensor infrared", h: 4.5cm),
+  ),
   teknis(
     lst([Flux matahari]),
     lst([Flux matahari / intensitas cahaya], [Air hujan]),
     lst([Buka-tutup atap kavling pada pagi hari, pukul 07:00 – 09:00]),
     lst([Buka-tutup atap kavling saat hujan atau saat flux UV matahari terlalu tinggi]),
   ),
-  tbd,
-  tbd,
-  lst([Geared DC motor], [Sensor infrared #sym.times 2]),
-  harga(
-    [1], [Geared DC motor], tbd, tbd, tbd,
-    [2], [Sensor infrared], [2], tbd, tbd,
+  komponen(
+    tbd,
+    tbd,
+    lst([Geared DC motor], [Sensor infrared #sym.times 2]),
+  ),
+)
+
+=== Badan Kavling (Kavling ke Lingkungan Internal)
+
+#bagian(
+  tjn(
+    [Kualitas udara di dalam kavling harus dijaga agar tanaman tumbuh baik.],
+    [Membuat lingkungan udara yang ideal sesuai parameter ideal.],
+  ),
+  foto("Sisi-sisi kavling", h: 5cm),
+  teknis(
+    lst([Suhu], [Kadar oksigen], [Kadar karbon dioksida]),
+    lst([Suhu], [Kadar oksigen (malam)], [Kadar karbon dioksida (siang)], [Kelembapan udara]),
+    lst(
+      [Penyemprotan air pada jam-jam tertentu sesuai program],
+      [Penyemprotan pestisida pada jam-jam tertentu sesuai program],
+    ),
+    lst(
+      [Memasukkan udara dari lingkungan luar ke internal kavling],
+      [Penyesuaian kadar oksigen / karbon dioksida],
+      [Penyesuaian kelembapan udara],
+      [Penyaluran gas karbon dioksida saat jam-jam efektif flux matahari],
+      [Penyaluran gas oksigen saat kadar oksigen kurang pada malam hari],
+    ),
+  ),
+  komponen(
+    tbd,
+    [
+      #figure(
+        kind: table,
+        supplement: [Tabel],
+        caption: [Rancangan geometri dan struktur kavling dalam],
+        tabel(
+          columns: (auto, 1fr, 2fr),
+          align: (center, center, left),
+          [*No*], [*Keterangan*], [*Nilai*],
+          [1], [Dimensi], [266 (panjang) #sym.times 186 (lebar) #sym.times 120 (tinggi) cm],
+          [2], [Keliling], [904 cm],
+          [3], [Volume], [5.937.120 cm#super[3]],
+        ),
+      ) <tbl-geometri>
+    ],
+    tbd,
+  ),
+)
+
+=== Pot Kavling (Kavling ke Tanaman)
+
+#bagian(
+  tjn(
+    [Kondisi tanah di dalam pot harus sesuai kebutuhan tanaman.],
+    [Membuat lingkungan tanah yang ideal sesuai parameter ideal.],
+  ),
+  foto("Pot tanaman dan sensor tanah", h: 5cm),
+  teknis(
+    lst([pH tanah], [Kelembapan tanah / kadar air tanah]),
+    lst([pH tanah], [Kelembapan tanah / kadar air tanah]),
+    lst([Pemasukan campuran air dan pupuk ke tanah]),
+    lst([Pemasukan air ke tanah], [Pemasukan cairan pH]),
+  ),
+  komponen(
+    tbd,
+    tbd,
+    tbd,
   ),
 )
 
@@ -462,10 +514,7 @@ dilengkapi pada tahap berikutnya.
     [Lingkungan di dalam kavling membutuhkan suplai bahan pendukung yang tersedia dan terpantau.],
     [Menyediakan suplai bahan-bahan untuk mendukung lingkungan di dalam kavling.],
   ),
-  [
-    Komponen: *box di samping kavling*.
-    #foto("Box suplai dan tangki-tangki di samping kavling", h: 5cm)
-  ],
+  foto("Box suplai dan tangki-tangki di samping kavling", h: 5cm),
   teknis(
     lst(
       [Air dalam tangki], [Pestisida dalam tangki], [Pupuk dalam tangki],
@@ -484,81 +533,24 @@ dilengkapi pada tahap berikutnya.
       [Memasukkan campuran pupuk dengan air lalu mengaduknya],
     ),
   ),
-  tbd,
-  tbd,
-  tbd,
-  tbd,
+  komponen(
+    tbd,
+    tbd,
+    tbd,
+  ),
 )
 
-== Kavling ke Lingkungan Internal
+== Kavling Interface
 
 #bagian(
   tjn(
-    [Kualitas udara di dalam kavling harus dijaga agar tanaman tumbuh baik.],
-    [Membuat lingkungan udara yang ideal sesuai parameter ideal.],
-  ),
-  [
-    Komponen: *sisi-sisi kavling*.
-    #foto("Sisi-sisi kavling", h: 5cm)
-  ],
-  teknis(
-    lst([Suhu], [Kadar oksigen], [Kadar karbon dioksida]),
-    lst([Suhu], [Kadar oksigen (malam)], [Kadar karbon dioksida (siang)], [Kelembapan udara]),
+    [Pengguna tidak mengetahui keadaan suhu, udara, gas, dan banyak hal lain dalam ekosistem kavling.],
     lst(
-      [Penyemprotan air pada jam-jam tertentu sesuai program],
-      [Penyemprotan pestisida pada jam-jam tertentu sesuai program],
-    ),
-    lst(
-      [Memasukkan udara dari lingkungan luar ke internal kavling],
-      [Penyesuaian kadar oksigen / karbon dioksida],
-      [Penyesuaian kelembapan udara],
-      [Penyaluran gas karbon dioksida saat jam-jam efektif flux matahari],
-      [Penyaluran gas oksigen saat kadar oksigen kurang pada malam hari],
-    ),
-  ),
-  tbd,
-  tbd,
-  tbd,
-  tbd,
-)
-
-== Kavling Pot ke Tanaman
-
-#bagian(
-  tjn(
-    [Kondisi tanah di dalam pot harus sesuai kebutuhan tanaman.],
-    [Membuat lingkungan tanah yang ideal sesuai parameter ideal.],
-  ),
-  [
-    Komponen: *pot di dalam kavling*.
-    #foto("Pot tanaman dan sensor tanah", h: 5cm)
-  ],
-  teknis(
-    lst([pH tanah], [Kelembapan tanah / kadar air tanah]),
-    lst([pH tanah], [Kelembapan tanah / kadar air tanah]),
-    lst([Pemasukan campuran air dan pupuk ke tanah]),
-    lst([Pemasukan air ke tanah], [Pemasukan cairan pH]),
-  ),
-  tbd,
-  tbd,
-  tbd,
-  tbd,
-)
-
-== Kavling Interface ke User
-
-#bagian(
-  tjn(
-    [Pengamat perlu tahu kondisi kavling, dan status kavling perlu ditentukan.],
-    lst(
-      [Memberi tahu pengamat informasi terkini tentang kavling],
+      [Menyajikan data kavling terkini kepada pengguna / pengawas kavling],
       [Menentukan keberlangsungan kavling: sedang "Merawat" atau "Panen"],
     ),
   ),
-  [
-    Komponen: *box interface di samping kavling*.
-    #foto("Box interface (layar atau tampilan status)", h: 5cm)
-  ],
+  foto("Box interface (layar atau tampilan status)", h: 5cm),
   teknis(
     lst([Status kavling]),
     lst([Input status kavling]),
@@ -571,16 +563,17 @@ dilengkapi pada tahap berikutnya.
     ),
     lst([Membuka atap kavling saat status "Panen"]),
   ),
-  tbd,
-  tbd,
-  tbd,
-  tbd,
+  komponen(
+    tbd,
+    tbd,
+    tbd,
+  ),
 )
 
 = Penutup
 
-Dokumen ini menjelaskan gambaran besar Kavling Pintar: lima bagian sistem
-beserta komponen, parameter, pendeteksian, aksi, dan tujuannya. Nilai
-parameter ideal akan ditentukan di dalam program, dan daftar komponen
-elektronik akan dilengkapi untuk bagian suplai, udara internal, pot, dan
-antarmuka.
+Dokumen ini menjelaskan gambaran besar Kavling Pintar: tiga bagian besar
+sistem (kavling, source supply, dan interface) beserta komponen, parameter,
+pendeteksian, aksi, dan tujuannya. Nilai parameter ideal akan ditentukan di
+dalam program, dan penjelasan serta daftar bahan komponen akan dilengkapi pada
+tahap berikutnya.
